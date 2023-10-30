@@ -1,0 +1,299 @@
+<html>
+
+<head>
+    <title>three.js + ar.js</title>
+    <meta name="viewport" content="width=device-width, viewport-fit=cover, shrink-to-fit=no" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <canvas></canvas>
+    </div>
+    <!--❶ three.jsとAR.jsを読み込む-->
+    <script src="https://unpkg.com/three@0.127.0/build/three.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.3/three.js/build/ar.js"></script>
+    <script async>
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.querySelector('canvas'),
+            antialias: true,
+            alpha: true
+        });
+        const camera = new THREE.PerspectiveCamera();
+        const scene = new THREE.Scene();
+        const markerRoot = new THREE.Group();
+        const arToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: './camera.dat', // ❷ camera.datを読み込む
+            detectionMode: 'mono'
+        });
+        const arToolkitSource = new THREEx.ArToolkitSource({
+            sourceType: 'webcam'
+        });
+        const arMarkerControl = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            type: 'pattern',
+            patternUrl: 'pattern.patt' // ❸ pattern.pattを読み込む
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        window.addEventListener('resize', handleResize, {
+            passive: true
+        });
+
+        arToolkitContext.init(() => {
+            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        });
+
+        arToolkitSource.init(() => {
+            document.querySelector('.wrapper').appendChild(arToolkitSource.domElement); // ❹ videoタグを.wrapper配下に移動させる
+            setTimeout(handleResize, 400); // ❺ リサイズイベントを一度発火させる
+        });
+
+        scene.add(markerRoot);
+
+        const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+        directionalLight.position.set(1, 0, 1);
+        scene.add(directionalLight);
+
+        var flg = -1;
+
+        function createwagasa1() {
+            const sirusi_geometry = new THREE.BoxGeometry(0.01, 0.01, 0.01);
+            const sirusi_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0xff0000 });
+            const sirusi = new THREE.Mesh(sirusi_geometry, sirusi_material);
+            const kasatop_geometry = new THREE.CylinderGeometry(0.07, 0.19, 0.075, 36, 36, true);
+            const kasatop_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0xff0000 });
+            const kasatop_cylinder = new THREE.Mesh(kasatop_geometry, kasatop_material);
+            const kasamiddle_geometry = new THREE.CylinderGeometry(0.18, 0.31, 0.075, 36, 36, true);
+            const kasamiddle_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0xffffff });
+            const kasamiddle_cylinder = new THREE.Mesh(kasamiddle_geometry, kasamiddle_material);
+            kasamiddle_cylinder.position.y += -0.075;
+            kasatop_cylinder.add(kasamiddle_cylinder);
+            const kasa_geometry = new THREE.CylinderGeometry(0.3, 0.55, 0.15, 36, 36, true);
+            const kasa_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0xff0000 });
+            const kasa_cylinder = new THREE.Mesh(kasa_geometry, kasa_material);
+            kasa_cylinder.position.y += -0.19;
+            kasatop_cylinder.add(kasa_cylinder);
+            const wireframe_geometry = new THREE.CylinderGeometry(0.07, 0.55, 0.3, 24, 1, true);
+            const wireframe_material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            wireframe_material.wireframe = true;
+            const wireframe_cylinder = new THREE.Mesh(wireframe_geometry, wireframe_material);
+            wireframe_cylinder.position.y += -0.115;
+            kasatop_cylinder.add(wireframe_cylinder);
+            const top_geometry = new THREE.CylinderGeometry(0.07, 0.07, 0.05, 36, 36, false);
+            const top_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x000000 });
+            const top = new THREE.Mesh(top_geometry, top_material);
+            top.position.y += 0.057;
+            kasatop_cylinder.add(top);
+            const temoti_geometry = new THREE.CylinderGeometry(0.025, 0.025, 0.6, 36, 36, false);
+            const temoti_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x000000 });
+            const temoti = new THREE.Mesh(temoti_geometry, temoti_material);
+            temoti.position.y += -0.18;
+            kasatop_cylinder.add(temoti);
+            const temoti2_geometry = new THREE.CylinderGeometry(0.025, 0.025, 0.25, 36, 36, false);
+            const temoti2_material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0xffebcd });
+            const temoti2 = new THREE.Mesh(temoti2_geometry, temoti2_material);
+            temoti2.position.y += -0.6;
+            kasatop_cylinder.add(temoti2);
+            const goldwireframe_geometry = new THREE.CylinderGeometry(0.2, 0.14, 0.07, 24, 1, true);
+            const goldwireframe_material = new THREE.MeshBasicMaterial({ color: 0xdaa520 });
+            goldwireframe_material.wireframe = true;
+            const goldwireframe_cylinder = new THREE.Mesh(goldwireframe_geometry, goldwireframe_material);
+            goldwireframe_cylinder.position.y += -0.1;
+            kasatop_cylinder.add(goldwireframe_cylinder);
+            const yellowwireframe_geometry = new THREE.CylinderGeometry(0.14, 0.12, 0.03, 24, 1, true);
+            const yellowwireframe_material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+            yellowwireframe_material.wireframe = true;
+            const yellowwireframe_cylinder = new THREE.Mesh(yellowwireframe_geometry, yellowwireframe_material);
+            yellowwireframe_cylinder.position.y += -0.15;
+            kasatop_cylinder.add(yellowwireframe_cylinder);
+            const whitewireframe_geometry = new THREE.CylinderGeometry(0.12, 0.1, 0.03, 24, 1, true);
+            const whitewireframe_material = new THREE.MeshBasicMaterial({ color: 0xffffafa });
+            whitewireframe_material.wireframe = true;
+            const whitewireframe_cylinder = new THREE.Mesh(whitewireframe_geometry, whitewireframe_material);
+            whitewireframe_cylinder.position.y += -0.18;
+            kasatop_cylinder.add(whitewireframe_cylinder);
+            const skybluewireframe_geometry = new THREE.CylinderGeometry(0.1, 0.08, 0.03, 24, 1, true);
+            const skybluewireframe_material = new THREE.MeshBasicMaterial({ color: 0x4169e1 });
+            skybluewireframe_material.wireframe = true;
+            const skybluewireframe_cylinder = new THREE.Mesh(skybluewireframe_geometry, skybluewireframe_material);
+            skybluewireframe_cylinder.position.y += -0.21;
+            kasatop_cylinder.add(skybluewireframe_cylinder);
+            const goldwireframe_geometry2 = new THREE.CylinderGeometry(0.08, 0.06, 0.03, 24, 1, true);
+            const goldwireframe_material2 = new THREE.MeshBasicMaterial({ color: 0xdaa520 });
+            goldwireframe_material2.wireframe = true;
+            const goldwireframe_cylinder2 = new THREE.Mesh(goldwireframe_geometry2, goldwireframe_material2);
+            goldwireframe_cylinder2.position.y += -0.24;
+            kasatop_cylinder.add(goldwireframe_cylinder2);
+            kasatop_cylinder.position.y += 0.3;
+            sirusi.add(kasatop_cylinder);
+            // const goldwireframe_geometry2 = new THREE.CylinderGeometry(0.135, 0.055, 0.12, 24, 1, true);
+            // const goldwireframe_material2 = new THREE.MeshBasicMaterial({ color: 0xdaa520 });
+            // goldwireframe_material2.wireframe = true;
+            // const goldwireframe_cylinder2 = new THREE.Mesh(goldwireframe_geometry2, goldwireframe_material2);
+            // goldwireframe_cylinder2.position.y += -0.2;
+            // kasatop_cylinder.add(goldwireframe_cylinder2);
+            return sirusi;
+        }
+
+        const wagasa1 = createwagasa1();
+        wagasa1.position.set((Math.random() - 2.5), (Math.random() - 0.5), -4);
+        markerRoot.add(wagasa1);
+        const wagasa2 = createwagasa1();
+        wagasa2.position.set((Math.random() - 2.5), (Math.random() - 0.5), -5);
+        markerRoot.add(wagasa2);
+        const wagasa3 = createwagasa1();
+        wagasa3.position.set((Math.random() - 1.5), (Math.random() - 0.5), -4.5);
+        markerRoot.add(wagasa3);
+        const wagasa4 = createwagasa1();
+        wagasa4.position.set((Math.random() - 1.5), (Math.random() - 0.5), -4);
+        markerRoot.add(wagasa4);
+        const wagasa5 = createwagasa1();
+        wagasa5.position.set((Math.random() - 0.5), (Math.random() - 0.5), -4.5);
+        markerRoot.add(wagasa5);
+        const wagasa6 = createwagasa1();
+        wagasa6.position.set((Math.random() - 0.5), (Math.random() - 0.5), -5);
+        markerRoot.add(wagasa6);
+        const wagasa7 = createwagasa1();
+        wagasa7.position.set((Math.random() + 0.5), (Math.random() - 0.5), -4.5);
+        markerRoot.add(wagasa7);
+        const wagasa8 = createwagasa1();
+        wagasa8.position.set((Math.random() + 0.5), (Math.random() - 0.5), -4);
+        markerRoot.add(wagasa8);
+        const wagasa9 = createwagasa1();
+        wagasa9.position.set((Math.random() + 1.5), (Math.random() - 0.5), -5);
+        markerRoot.add(wagasa9);
+        const wagasa10 = createwagasa1();
+        wagasa10.position.set((Math.random() + 1.5), (Math.random() - 0.5), -4);
+        markerRoot.add(wagasa10);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            wagasa1.position.z += 0.2 / 10;
+            wagasa2.position.z += 0.33 / 10;
+            wagasa3.position.z += 0.14 / 10;
+            wagasa4.position.z += 0.27 / 10;
+            wagasa5.position.z += 0.22 / 10;
+            wagasa6.position.z += 0.46 / 10;
+            wagasa7.position.z += 0.32 / 10;
+            wagasa8.position.z += 0.55 / 10;
+            wagasa9.position.z += 0.16 / 10;
+            wagasa10.position.z += 0.39 / 10;
+            if (flg != -1) {
+                wagasa1.rotation.x += Math.PI / 180 * 3;
+                wagasa1.rotation.z += Math.PI / 180 * 2;
+                wagasa2.rotation.x += Math.PI / 180 * 4;
+                wagasa2.rotation.z -= Math.PI / 180 * 2;
+                wagasa3.rotation.x += Math.PI / 180 * 4;
+                wagasa3.rotation.z -= Math.PI / 180 * 3;
+                wagasa4.rotation.x += Math.PI / 180;
+                wagasa4.rotation.z -= Math.PI / 180 * 5;
+                wagasa5.rotation.x -= Math.PI / 180 * 5;
+                wagasa5.rotation.z += Math.PI / 180 * 1;
+                wagasa6.rotation.x -= Math.PI / 180 * 4;
+                wagasa6.rotation.z += Math.PI / 180 * 3;
+                wagasa7.rotation.x += Math.PI / 180 * 1;
+                wagasa7.rotation.z -= Math.PI / 180 * 5;
+                wagasa8.rotation.x -= Math.PI / 180 * 2;
+                wagasa8.rotation.z -= Math.PI / 180 * 2;
+                wagasa9.rotation.x += Math.PI / 180 * 4;
+                wagasa9.rotation.z += Math.PI / 180;
+                wagasa10.rotation.x += Math.PI / 180 * 5;
+                wagasa10.rotation.z -= Math.PI / 180 * 3;
+            }
+            wagasa1.rotation.y += Math.PI / 180 * 3;
+            wagasa2.rotation.y += Math.PI / 180 * 4;
+            wagasa3.rotation.y += Math.PI / 180 * 4;
+            wagasa4.rotation.y += Math.PI / 180;
+            wagasa5.rotation.y -= Math.PI / 180 * 5;
+            wagasa6.rotation.y -= Math.PI / 180 * 4;
+            wagasa7.rotation.y += Math.PI / 180 * 1;
+            wagasa8.rotation.y -= Math.PI / 180 * 2;
+            wagasa9.rotation.y += Math.PI / 180 * 4;
+            wagasa10.rotation.y += Math.PI / 180 * 5;
+
+            if (wagasa1.position.z > 4) {
+                wagasa1.position.z = -4;
+            }
+            if (wagasa2.position.z > 4) {
+                wagasa2.position.z = -4;
+            }
+            if (wagasa3.position.z > 4) {
+                wagasa3.position.z = -4;
+            }
+            if (wagasa4.position.z > 4) {
+                wagasa4.position.z = -4;
+            }
+            if (wagasa5.position.z > 4) {
+                wagasa5.position.z = -4;
+            }
+            if (wagasa6.position.z > 4) {
+                wagasa6.position.z = -4;
+            }
+            if (wagasa7.position.z > 4) {
+                wagasa7.position.z = -4;
+            }
+            if (wagasa8.position.z > 4) {
+                wagasa8.position.z = -4;
+            }
+            if (wagasa9.position.z > 4) {
+                wagasa9.position.z = -4;
+            }
+            if (wagasa10.position.z > 4) {
+                wagasa10.position.z = -4;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener("mousedown", function (ret) {
+            let mouseX = ret.clientX;                           // マウスのx座標
+            let mouseY = ret.clientY;                           // マウスのy座標
+            //console.log(mouseX + " : " + mouseY);
+            mouseX = (mouseX / window.innerWidth) * 2 - 1;    // -1 ～ +1 に正規化されたx座標
+            mouseY = -(mouseY / window.innerHeight) * 2 + 1;    // -1 ～ +1 に正規化されたy座標
+            let pos = new THREE.Vector3(mouseX, mouseY, 1);     // マウスベクトル
+            pos.unproject(camera);                              // スクリーン座標系をカメラ座標系に変換
+            // レイキャスタを作成（始点, 向きのベクトル）
+            let ray = new THREE.Raycaster(camera.position, pos.sub(camera.position).normalize());
+            let obj = ray.intersectObjects(scene.children, true);   // レイと交差したオブジェクトの取得
+            flg = flg * -1;
+            console.log("come");
+            if (obj.length > 0) {                                // 交差したオブジェクトがあれば
+                // picked(obj[0].object.name);                       // ピックされた対象に応じた処理を実行
+                // console.log(obj[0].object.name)
+                // console.log("debug 001");
+            }
+            // console.log("-----");
+        });
+
+        renderer.setAnimationLoop((delta) => {
+            if (arToolkitSource.ready) {
+                arToolkitContext.update(arToolkitSource.domElement);
+            }
+
+            renderer.render(scene, camera);
+        });
+
+        function handleResize() {
+            if (arToolkitSource.ready) {
+                arToolkitSource.onResize();
+                arToolkitSource.copySizeTo(renderer.domElement);
+            }
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+        }
+    </script>
+</body>
+
+</html>
